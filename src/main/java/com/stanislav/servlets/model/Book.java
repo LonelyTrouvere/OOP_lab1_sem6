@@ -12,4 +12,6 @@ public class Book {
     private String name;
     private long copy;
     private Boolean available;
+    private String description;
+    private String author;
 }

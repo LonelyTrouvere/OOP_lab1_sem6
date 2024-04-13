@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @WebServlet("/book")
@@ -41,7 +43,9 @@ public class BookServlet extends HttpServlet  {
                     uuid.toString(),
                     (String)json.get("name"),
                     copy,
-                    available
+                    available,
+                    (String)json.get("description"),
+                    (String)json.get("author")
             ));
         } catch (ParseException e) {
             throw new IOException(e);
@@ -50,12 +54,23 @@ public class BookServlet extends HttpServlet  {
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String id = req.getParameter("id");
-        Book book = bookDAO.readSingle(id);
-        String resString = gson.toJson(book);
-        PrintWriter out = res.getWriter();
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
-        out.println(resString);
+        if(id == null){
+            List<Book> book = bookDAO.readMany();
+            String resString = gson.toJson(book);
+            PrintWriter out = res.getWriter();
+            res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
+            res.addHeader("Access-Control-Allow-Origin", "*");
+            out.println(resString);
+        } else {
+            Book book = bookDAO.readSingle(id);
+            String resString = gson.toJson(book);
+            PrintWriter out = res.getWriter();
+            res.setContentType("application/json");
+            res.setCharacterEncoding("UTF-8");
+            res.addHeader("Access-Control-Allow-Origin", "*");
+            out.println(resString);
+        }
     }
 
     public void doPut(HttpServletRequest req, HttpServletResponse res) throws IOException {
@@ -81,7 +96,9 @@ public class BookServlet extends HttpServlet  {
                 copy = bookToUpdate.getCopy();
             }
             boolean available = copy != 0;
-            bookDAO.update(new Book(id, name != null ? name : bookToUpdate.getName(), copy, available));
+            String descr = (String) json.get("description");
+            String author = (String)json.get("author");
+            bookDAO.update(new Book(id, name != null ? name : bookToUpdate.getName(), copy, available, descr != null ? descr : bookToUpdate.getDescription(), author != null ? author : bookToUpdate.getAuthor()));
         } catch (ParseException e) {
             throw new IOException(e);
         }
