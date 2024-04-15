@@ -35,11 +35,16 @@ public class UserServlet extends HttpServlet {
         String requestBody = sb.toString();
         try {
             JSONObject json = (JSONObject) jsonParser.parse(requestBody);
+            String email = (String) json.get("email");
+            User checkExists = userDAO.readByEmai(email);
+            if (checkExists != null){
+                throw new IOException("User with this email already exists");
+            }
             String uuid = UUID.randomUUID().toString();
             userDAO.creat(
                     new User(
                         uuid,
-                            (String) json.get("email"),
+                            email,
                             (String) json.get("phone"),
                             (String) json.get("firstName"),
                             (String) json.get("lastName")

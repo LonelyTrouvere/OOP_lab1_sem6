@@ -52,6 +52,25 @@ public class UserDAO extends DAO{
         }
     }
 
+    public User readByEmai(String email){
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setString(1, email);
+            ResultSet res = preparedStatement.executeQuery();
+            if (res.next()) {
+                return new User(res.getString("id"), res.getString("email"), res.getString("phone"), res.getString("first_name"), res.getString("last_name"));
+            }
+            return null;
+        } catch (
+                SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void update(User user){
         String sql = "UPDATE users SET first_name = ?, last_name = ?, phone = ? WHERE id = ?";
         try {
