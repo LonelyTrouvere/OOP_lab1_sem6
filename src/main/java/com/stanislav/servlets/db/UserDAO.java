@@ -1,6 +1,7 @@
 package com.stanislav.servlets.db;
 
 import com.stanislav.servlets.model.Book;
+import com.stanislav.servlets.model.Password;
 import com.stanislav.servlets.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -62,6 +63,25 @@ public class UserDAO extends DAO{
             ResultSet res = preparedStatement.executeQuery();
             if (res.next()) {
                 return new User(res.getString("id"), res.getString("email"), res.getString("phone"), res.getString("first_name"), res.getString("last_name"));
+            }
+            return null;
+        } catch (
+                SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Password getPassword(String id){
+        String sql = "SELECT password, salt FROM users WHERE id = ?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setString(1, id);
+            ResultSet res = preparedStatement.executeQuery();
+            if (res.next()) {
+               return new Password(res.getString("password"), res.getString("salt"));
             }
             return null;
         } catch (

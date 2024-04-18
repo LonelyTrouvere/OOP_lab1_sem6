@@ -60,7 +60,6 @@ public class BookServlet extends HttpServlet  {
             PrintWriter out = res.getWriter();
             res.setContentType("application/json");
             res.setCharacterEncoding("UTF-8");
-            res.addHeader("Access-Control-Allow-Origin", "*");
             out.println(resString);
         } else {
             Book book = bookDAO.readSingle(id);
@@ -68,7 +67,6 @@ public class BookServlet extends HttpServlet  {
             PrintWriter out = res.getWriter();
             res.setContentType("application/json");
             res.setCharacterEncoding("UTF-8");
-            res.addHeader("Access-Control-Allow-Origin", "*");
             out.println(resString);
         }
     }
