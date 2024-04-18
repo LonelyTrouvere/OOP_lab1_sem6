@@ -17,14 +17,17 @@ public class CORSInterceptor implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers", "*");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Methods",
                 "GET, OPTIONS, HEAD, PUT, POST, DELETE");
 
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
-        filterChain.doFilter(request, servletResponse);
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            filterChain.doFilter(request, servletResponse);
+        }
     }
 
     @Override

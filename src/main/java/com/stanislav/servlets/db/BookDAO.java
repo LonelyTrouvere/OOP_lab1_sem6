@@ -87,7 +87,7 @@ public class BookDAO extends DAO{
         }
     }
 
-    public void delete (String id){
+    public void delete (String id) throws Error{
         String sql = "DELETE FROM book WHERE id = ?";
         try {
             Connection connection = getConnection();
@@ -95,6 +95,53 @@ public class BookDAO extends DAO{
 
             preparedStatement.setString(1, id);
             preparedStatement.executeQuery();
+        } catch (
+                SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void reserve(String bookId){
+        Book reservedBook = readSingle(bookId);
+        long copies = reservedBook.getCopy();
+        Connection connection = getConnection();
+        String sql;
+        if(copies <= 0){
+            throw new Error("Can't reserve this book, no copies left");
+        }
+
+        try{
+            if(copies == 1) {
+                sql = "UPDATE book SET copy = ?, available = ? WHERE id = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setLong(1, 0);
+                preparedStatement.setBoolean(2, false);
+                preparedStatement.setString(3, bookId);
+                preparedStatement.executeQuery();
+            } else {
+                sql = "UPDATE book SET copy = ? WHERE id = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setLong(1, copies-1);
+                preparedStatement.setString(2, bookId);
+                preparedStatement.executeQuery();
+            }
+        } catch (
+                SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void dereservation(String bookId){
+        Book reservedBook = readSingle(bookId);
+        String sql = "UPDATE book SET copy = ?, available = ? WHERE id = ?";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setLong(1, reservedBook.getCopy()+1);
+            preparedStatement.setBoolean(2, true);
+            preparedStatement.setString(3, bookId);
+            preparedStatement.executeUpdate();
         } catch (
                 SQLException e) {
             e.printStackTrace();
